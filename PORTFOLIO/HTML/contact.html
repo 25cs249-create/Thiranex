@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact Harin Rajaditya to discuss internship opportunities, development collaborations, or software projects.">
+    <title>Contact | Harin Rajaditya</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header role="banner">
+        <nav aria-label="Main Navigation">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="contact.html" aria-current="page">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content" role="main">
+        <section aria-labelledby="contact-heading">
+            <h1 id="contact-heading">Get In Touch</h1>
+            <p>I am currently open to new software development internships and collaborative projects. Please fill out the form below to connect.</p>
+            
+            <form action="/submit-endpoint" method="POST" aria-labelledby="contact-heading">
+                <fieldset style="border: none; padding: 0; margin: 0;">
+                    <legend class="sr-only" style="position: absolute; left: -9999px;">Contact Information</legend>
+                    
+                    <div class="form-group">
+                        <label for="user-name">Full Name (Required)</label>
+                        <input type="text" id="user-name" name="user-name" required aria-required="true" autocomplete="name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-email">Email Address (Required)</label>
+                        <input type="email" id="user-email" name="user-email" required aria-required="true" autocomplete="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="user-message">Message (Required)</label>
+                        <textarea id="user-message" name="user-message" rows="6" required aria-required="true"></textarea>
+                    </div>
+                    
+                    <button type="submit">Send Message</button>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2026 Harin Rajaditya. All rights reserved.</p>
+    </footer>
+</body>
+</html>

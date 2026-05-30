@@ -1,0 +1,132 @@
+/* style.css */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --primary-link: #0056b3;
+    --focus-ring: #ffbf47;
+}
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 0;
+}
+
+/* Accessibility: Skip to Main Content Link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    z-index: 100;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--focus-ring);
+}
+
+/* Navigation */
+header {
+    background: #f8f9fa;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #ddd;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 0.25rem;
+}
+
+nav a:focus, nav a:hover, nav a[aria-current="page"] {
+    color: var(--primary-link);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+nav a:focus {
+    outline: 3px solid var(--focus-ring);
+    background-color: #000;
+    color: #fff;
+}
+
+/* Main Content */
+main {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    min-height: 70vh;
+}
+
+article {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+/* Accessible Forms */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #767676;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+input:focus, textarea:focus {
+    outline: 3px solid var(--focus-ring);
+    border-color: #000;
+}
+
+button {
+    background-color: var(--primary-link);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:focus, button:hover {
+    background-color: #004494;
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+footer {
+    text-align: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+}

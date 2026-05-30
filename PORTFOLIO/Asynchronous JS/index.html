@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A real-time weather dashboard fetching asynchronous JSON data from a RESTful API.">
+    <title>Async Weather Dashboard</title>
+    <style>
+        /* Modern, accessible styling */
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-primary: #102a43;
+            --text-secondary: #627d98;
+            --accent: #1864ab;
+            --error: #d93025;
+            --focus-ring: #ffbf47;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .dashboard-container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.75rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        /* Search Form Styling */
+        .search-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border: 1px solid #bcccdc;
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        input:focus {
+            outline: 2px solid var(--accent);
+            border-color: transparent;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+        /* Weather Output Styling */
+        .weather-card {
+            display: none; /* Hidden until data is fetched */
+            text-align: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .weather-card.active { display: block; }
+
+        .city-name { font-size: 1.5rem; margin-bottom: 0.25rem; }
+        .description { color: var(--text-secondary); text-transform: capitalize; margin-bottom: 1rem; }
+        
+        .temp {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: var(--accent);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #bcccdc;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .metric-label { font-size: 0.875rem; color: var(--text-secondary); }
+        .metric-value { font-size: 1.25rem; font-weight: 600; }
+
+        /* Error Messaging */
+        .error-message {
+            color: var(--error);
+            text-align: center;
+            padding: 1rem;
+            background: #fce8e6;
+            border-radius: 6px;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="dashboard-container" role="main">
+        <h1>Weather Dashboard</h1>
+        
+        <form id="search-form" class="search-group">
+            <label for="city-input" class="sr-only" style="position: absolute; left: -9999px;">Enter City Name</label>
+            <input type="text" id="city-input" placeholder="e.g., London, Tokyo, New York" required autocomplete="off">
+            <button type="submit" id="search-btn">Search</button>
+        </form>
+
+        <div id="error-container" class="error-message" aria-live="assertive"></div>
+
+        <article id="weather-display" class="weather-card" aria-live="polite">
+            <h2 id="display-city" class="city-name">--</h2>
+            <p id="display-desc" class="description">--</p>
+            
+            <div class="temp">
+                <span id="display-temp">--</span>°C
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric">
+                    <span class="metric-label">Humidity</span>
+                    <span id="display-humidity" class="metric-value">--%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Wind Speed</span>
+                    <span id="display-wind" class="metric-value">-- km/h</span>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        // API Key injected here
+        const API_KEY = '245b75221833265e639dd4bb36854daa'; 
+        
+        // DOM Elements
+        const searchForm = document.getElementById('search-form');
+        const cityInput = document.getElementById('city-input');
+        const weatherDisplay = document.getElementById('weather-display');
+        const errorContainer = document.getElementById('error-container');
+
+        // Dynamic output elements
+        const displayCity = document.getElementById('display-city');
+        const displayDesc = document.getElementById('display-desc');
+        const displayTemp = document.getElementById('display-temp');
+        const displayHumidity = document.getElementById('display-humidity');
+        const displayWind = document.getElementById('display-wind');
+
+        /**
+         * Asynchronously fetch weather data and handle the promise
+         */
+        async function fetchWeather(city) {
+            // Reset UI states before fetching
+            errorContainer.style.display = 'none';
+            weatherDisplay.classList.remove('active');
+            
+            const endpoint = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`;
+
+            try {
+                // 1. Await the network request
+                const response = await fetch(endpoint);
+
+                // 2. Comprehensive Error Handling (e.g., 404 City Not Found, 401 Invalid API Key)
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error("City not found. Please check your spelling.");
+                    if (response.status === 401) throw new Error("Invalid API Key. Please verify your OpenWeatherMap key.");
+                    throw new Error("Unable to fetch weather data. Network error.");
+                }
+
+                // 3. Parse the nested JSON payload
+                const data = await response.json();
+                
+                // 4. Update the DOM
+                updateUI(data);
+
+            } catch (error) {
+                // 5. Handle failed network requests or thrown errors
+                renderError(error.message);
+            }
+        }
+
+        /**
+         * Update the DOM dynamically by extracting specific nested JSON values
+         */
+        function updateUI(data) {
+            // Destructuring nested objects from the JSON response
+            const { name } = data;
+            const { temp, humidity } = data.main;
+            const { speed } = data.wind;
+            const { description } = data.weather[0];
+
+            // Injecting text into the DOM
+            displayCity.textContent = name;
+            displayDesc.textContent = description;
+            
+            // Math.round() cleans up the floating point API returns
+            displayTemp.textContent = Math.round(temp);
+            displayHumidity.textContent = `${humidity}%`;
+            
+            // OpenWeatherMap returns wind in m/s, convert to km/h for standard readability
+            const windKmh = Math.round(speed * 3.6); 
+            displayWind.textContent = `${windKmh} km/h`;
+
+            // Reveal the weather card
+            weatherDisplay.classList.add('active');
+        }
+
+        /**
+         * Render error messages cleanly to the user
+         */
+        function renderError(message) {
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        /**
+         * Event Listener for the Search Form (handles both 'Enter' key and Button Click)
+         */
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent standard page reload
+            
+            const searchTerm = cityInput.value.trim();
+            if (searchTerm) {
+                fetchWeather(searchTerm);
+                cityInput.value = ''; // Clear input after search
+            }
+        });
+    </script>
+</body>
+</html>

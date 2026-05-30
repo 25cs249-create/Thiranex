@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal portfolio of Harin Rajaditya, a B.E. student and full-stack developer.">
+    <title>Harin Rajaditya | Portfolio</title>
+    
+    <style>
+        /* =========================================
+           1. CUSTOM CSS VARIABLES & THEMING
+           ========================================= */
+        :root {
+            /* Light Mode (Editorial / High Contrast) */
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #121212;
+            --text-secondary: #555555;
+            --accent: #111111;
+            --border: #e0e0e0;
+            --focus-ring: #cda434; /* Muted gold for focus accessibility */
+            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+            --transition-speed: 0.4s;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode (Cinematic / Sleek) */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --text-primary: #f4f4f4;
+            --text-secondary: #a0a0a0;
+            --accent: #ffffff;
+            --border: #2a2a2a;
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        /* =========================================
+           2. BASE STYLES & RESET (Mobile-First)
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Accessibility: Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 1rem;
+            z-index: 1000;
+            text-decoration: none;
+            font-weight: bold;
+            transition: top 0.2s;
+        }
+        .skip-link:focus { top: 0; }
+        
+        a, button, input, textarea {
+            transition: all 0.2s ease;
+        }
+        a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--focus-ring);
+            outline-offset: 4px;
+        }
+
+        /* =========================================
+           3. LAYOUT ARCHITECTURE (FLEXBOX)
+           ========================================= */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(var(--bg-secondary), 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            padding: 1rem 1.5rem;
+        }
+
+        /* Flexbox for localized component alignment */
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        nav a:hover, nav a[aria-current="page"] {
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .theme-toggle:hover {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        /* =========================================
+           4. MAIN CONTENT & CSS GRID
+           ========================================= */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        section {
+            margin-bottom: 6rem;
+            scroll-margin-top: 5rem; /* Fixes anchor jumping behind sticky header */
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem); /* Fluid typography */
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        h2.section-title {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        p.lead {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        /* CSS Grid for 2D Layouts */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile-first: 1 column */
+            gap: 2rem;
+        }
+
+        .project-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .project-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .project-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            flex-grow: 1; /* Pushes tags to the bottom */
+        }
+
+        /* =========================================
+           5. FORMS & FOOTER
+           ========================================= */
+        .contact-form {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 600px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        button[type="submit"] {
+            background-color: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            align-self: start;
+        }
+        button[type="submit"]:hover {
+            opacity: 0.8;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* =========================================
+           6. RESPONSIVE MEDIA QUERIES
+           ========================================= */
+        @media (min-width: 768px) {
+            .projects-grid {
+                /* Transforms to 2 columns on tablets */
+                grid-template-columns: repeat(2, 1fr);
+                gap: 3rem;
+            }
+            .contact-wrapper {
+                /* Uses Grid to split text and form on desktop */
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4rem;
+                align-items: start;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .projects-grid {
+                /* Transforms to a dynamic 3-column layout on large screens */
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <header role="banner">
+        <div class="nav-container">
+            <nav aria-label="Main Navigation">
+                <ul>
+                    <li><a href="#home" aria-current="page">Home</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Dark Mode">Dark Mode</button>
+        </div>
+    </header>
+
+    <main id="main-content" role="main">
+        <section id="home" aria-labelledby="about-heading">
+            <h1 id="about-heading">Harin Rajaditya</h1>
+            <p class="lead">B.E. student and full-stack developer. Specializing in Python, C++, and building efficient, scalable backend architectures.</p>
+        </section>
+
+        <section id="projects" aria-labelledby="projects-heading">
+            <h2 id="projects-heading" class="section-title">Technical Projects</h2>
+            
+            <div class="projects-grid">
+                <article class="project-card" aria-labelledby="proj1-heading">
+                    <h3 id="proj1-heading">Password Manager</h3>
+                    <p>A secure, Python-based application utilizing SQLite and advanced encryption techniques. Internally documented as <em>RAJADITYA_PasswordManager_InternshipReport_USC_UCT</em>.</p>
+                </article>
+
+                <article class="project-card" aria-labelledby="proj2-heading">
+                    <h3 id="proj2-heading">Mind Detector Spectacles</h3>
+                    <p>A conceptual product and creative marketing campaign exploring the intersection of wearable technology, user interaction, and data mapping.</p>
+                </article>
+
+                <article class="project-card" aria-labelledby="proj3-heading">
+                    <h3 id="proj3-heading">Piezoelectric PVDF Lab</h3>
+                    <p>Hardware experimentation analyzing the piezoelectric effects of PVDF polymers using custom electronic components, buzzers, and LEDs.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="contact" aria-labelledby="contact-heading">
+            <h2 id="contact-heading" class="section-title">Let's Connect</h2>
+            
+            <div class="contact-wrapper">
+                <div>
+                    <p class="lead" style="margin-bottom: 2rem;">I am currently open to new software development internships, collaborative engineering projects, and research opportunities.</p>
+                </div>
+                
+                <form class="contact-form" action="#" method="POST" aria-labelledby="contact-heading">
+                    <fieldset style="border: none; padding: 0; margin: 0;">
+                        <legend class="sr-only" style="display:none;">Contact Details</legend>
+                        
+                        <div class="form-group">
+                            <label for="user-name">Full Name</label>
+                            <input type="text" id="user-name" name="user-name" required aria-required="true" autocomplete="name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="user-email">Email Address</label>
+                            <input type="email" id="user-email" name="user-email" required aria-required="true" autocomplete="email">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="user-message">Message</label>
+                            <textarea id="user-message" name="user-message" rows="5" required aria-required="true"></textarea>
+                        </div>
+                        
+                        <button type="submit">Send Message</button>
+                    </fieldset>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <p>&copy; 2026 Harin Rajaditya. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            htmlElement.setAttribute('data-theme', newTheme);
+            toggleBtn.textContent = newTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+            toggleBtn.setAttribute('aria-label', `Switch to ${currentTheme} mode`);
+        });
+    </script>
+</body>
+</html>
